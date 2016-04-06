@@ -1,0 +1,18 @@
+{
+  "name": "netdata-plugin-ping",
+  "version": "1.0.0",
+  "description": "A Node.js external plugin for Netdata that logs pings.",
+  "main": "ping.plugin",
+  "author": "Sayantan Chaudhuri",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/5310/netdata-plugin-ping"
+  },
+  "dependencies": {
+    "rx": "^4.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

@@ -1,0 +1,50 @@
+#!/usr/bin/env node
+'use strict'
+
+const rx = require('rx').Observable
+const spawn = require('child_process').spawn
+
+function createPing$ (host, interval) {
+  host = host === undefined ? '8.8.8.8' : host
+  return rx.fromEvent(spawn('ping', ['-i', `${interval}`, '-O', host]).stdout, 'data')
+    .skip(1)
+    .map((data) => data.toString())
+    .map((output) => {
+      switch (true) {
+        case (output.startsWith('64 bytes')):
+          return Number.parseFloat(output.match(/time=(\d+(\.\d+)?) ms/)[1])
+        case (output.startsWith('no answer')):
+          return -1
+        case (output.search('Destination Host Unreachable') > -1):
+          return -2
+        default:
+          return -3
+      }
+    })
+}
+
+function stdout (s) {
+  process.stdout.write(s + '\n')
+}
+
+// Set configurations.
+const interval = Number.parseInt(process.argv[2], 10) || 2
+const hosts = process.argv.length > 3 ? process.argv.slice(3) : ['8.8.8.8']
+
+// Create ping streams.
+const ping$es = hosts.map((host, i) => createPing$(host, interval).map((ping) => ({id: `host${i}`, ping})))
+
+// Initialize the chart.
+stdout(`CHART net.ping '' 'Ping' 'ms' 'ping' '' area`)
+hosts.forEach((host, i) => stdout(`DIMENSION host${i} '${host}'`))
+
+// Plot data.
+rx.merge(...ping$es)
+  .windowWithTime(interval * 1000)
+  .map((data$) => data$
+    .map((datum) => `SET ${datum.id} = ${datum.ping}`)
+    .startWith(`BEGIN net.ping`)
+    .concat(rx.just(`END`))
+  )
+  .concatAll()
+  .subscribe(stdout)
