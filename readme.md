@@ -7,8 +7,9 @@ A Node.js external plugin for [Netdata](https://github.com/firehol/netdata) that
 1. Install the NPM package globally.
   - `npm install -g 5310/netdata-plugin-ping`
 2. Symlink the script to the Netdata plugins directory (`/usr/libexec/netdata/plugins.d/` by default).
-  - `ln -s /usr/lib/node_modules/netdata-plugin-ping/ping.plugin /usr/libexec/netdata/plugins.d/ping.plugin`
+  - `sudo ln -s /usr/lib/node_modules/netdata-plugin-ping/ping.plugin /usr/libexec/netdata/plugins.d/ping.plugin`
 3. Enable the plugin by editing Netdata configurations (`/etc/netdata/netdata.conf` by default) and adding `ping = yes` under the `[plugins]` section.
+4. Restart Netdata.
 
 ## Usage
 
